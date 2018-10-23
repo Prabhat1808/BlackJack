@@ -96,6 +96,14 @@ def prob_less(dealers_card, threshold,p):
 		answer= answer + prob_end(dealers_card, i ,p)
 	return answer
 
+def print_all():
+	for i in range(1,11):
+		for j in range(17,22):
+			print prob_end(i,j,0.307),
+		print prob_bust(i,0.307)
+
+
+print_all()
 
 
 
