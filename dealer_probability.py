@@ -87,20 +87,21 @@ def prob_greater(dealers_card, threshold, p):
 	for i in range(threshold+1, 22):
 		answer=answer+ prob_end(dealers_card, i, p)
 	answer=answer+ prob_bj(dealers_card,p)
-	answer=answer+ prob_bust(dealers_card,p)
+	#answer=answer+ prob_bust(dealers_card,p)
 	return answer
 
 def prob_less(dealers_card, threshold,p):
 	answer=0
 	for i in range(17, threshold):
 		answer= answer + prob_end(dealers_card, i ,p)
+	answer=answer+ prob_bust(dealers_card,p)
 	return answer
 
 def print_all():
 	for i in range(1,11):
 		for j in range(17,22):
 			print prob_end(i,j,0.307),
-		print prob_bust(i,0.307)
+		print prob_bj(i,0.307), prob_bust(i,0.307)
 
 
 print_all()
