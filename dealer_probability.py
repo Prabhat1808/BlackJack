@@ -105,18 +105,3 @@ def print_all():
 
 
 print_all()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

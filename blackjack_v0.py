@@ -10,7 +10,7 @@ def something(dealers_card,p):
 	#create stand matrix
 	q=(1.-p)/9
 	stand= [[[[DUMMY for i in range(0,2)] for j in range(0,2)] for k in range(0,2)] for l in range(0,32)]
-	#created a matrix of size [1-31][0-1][0-1]	
+	#created a matrix of size [1-31][0-1][0-1]
 
 	stand[11][1][1][0]= 1.5 * (1- prob_bj(dealers_card,p))
 	stand[11][1][1][1]= 1.5 * (1- prob_bj(dealers_card,p))
@@ -51,7 +51,7 @@ def something(dealers_card,p):
 		stand[i][1][1][0]=maxi(stand[i+10][0][0][0],stand[i][0][0][0])
 		stand[i][1][1][1]=maxi(stand[i+10][0][0][0],stand[i][0][0][0])
 		# because if sum is less than 21 toh sirf sum matter karega
-	
+
 	#time to sit down
 
 	#double down
@@ -101,14 +101,14 @@ def something(dealers_card,p):
 					hit[i][c][a][s] = 0
 					for j in range(2,10):
 						hit[i][c][a][s] += q * best[n+j][0][a][s]
-					hit[i][c][a][s] += p* best[n+10][0][a][s] 
+					hit[i][c][a][s] += p* best[n+10][0][a][s]
 					hit[i][c][a][s] += q* best[n+1][0][(a+2)/2][s]
 					if(c==0):
 						best[i][c][a][s]= maxi(hit[i][c][a][s],stand[i][c][a][s])
 					else:
 						best[i][c][a][s]= max(hit[i][c][a][s],stand[i][c][a][s],dd[i][c][a][s])
 						# best[i][c][a][s]= max()
-						
+
 	# we have assigned best values to splittable states which may not be correct
 	#take care
 	#potential source of error
@@ -120,6 +120,8 @@ def something(dealers_card,p):
 	#handling aces later
 	for i in range(2,11):
 		#case1 - assume split is besr
+		recalculate = False
+
 		split[2*i][1][0][1]= 0
 		temp=0
 		for j in range(2,i):
@@ -142,5 +144,28 @@ def something(dealers_card,p):
 			#badhiya
 			best[2*i][1][0][1]= split[2*i][1][0][1]
 		else:
+			best[2*i][1][0][1] = max(hit[2*i][1][0][1],stand[2*i][1][0][1],double[2*i][1][0][1])
+			recalculate = True
 			#panga ho giya
 			#dhyaan se likhiyo please
+		if(recalculate):
+			# recalculating the value for split, since initial assumption(split being best) was false
+			split[2*i][1][0][1]= 0
+			for j in range(2,i):
+				split[2*i][1][0][1] += q*best[i+j][1][0][0]
+			for j in range(i+1,10):
+				split[2*i][1][0][1] += q*best[i+j][1][0][0]
+			split[2*i][1][0][1] += q* best[i+1][1][1][0]
+			if(i!=10):
+				split[2*i][1][0][1] +=  p*best[i+10][1][0][0]
+			split[2*i][1][0][1] *= 2
+
+	# Handling aces now
+	best[2][1][1][1] = max(hit[2][1][1][1],stand[2][1][1][1],double[2][1][1][1])
+	split[2][1][1][1]= 0
+	for j in range(2,10):
+		split[2][1][1][1] += q*best[1+j][1][1][0]
+	split[2][1][1][1] += q* best[2][1][1][1]
+	# How to handle this...coz this is no longer splittable, even if we get another ACE
+	# what should be on RHS of above statement? -> best[2][1][1][1] or best[2][1][1][0] ??
+	split[2][1][1][1] *= 2
