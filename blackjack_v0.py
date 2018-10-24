@@ -1,4 +1,10 @@
 from dealer_probability import *
+import numpy as np
+
+P = 0.307
+HARD= []
+SOFT=[]
+PAIR=[]
 
 def maxi(a,b):
 	if a>b:
@@ -10,7 +16,7 @@ def something(dealers_card,p):
 	#create stand matrix
 	q=(1.-p)/9
 	stand= [[[[DUMMY for i in range(0,2)] for j in range(0,2)] for k in range(0,2)] for l in range(0,32)]
-	#created a matrix of size [1-31][0-1][0-1]	
+	#created a matrix of size [1-31][0-1][0-1]
 
 	stand[11][1][1][0]= 1.5 * (1- prob_bj(dealers_card,p))
 	stand[11][1][1][1]= 1.5 * (1- prob_bj(dealers_card,p))
@@ -51,7 +57,7 @@ def something(dealers_card,p):
 		stand[i][1][1][0]=maxi(stand[i+10][0][0][0],stand[i][0][0][0])
 		stand[i][1][1][1]=maxi(stand[i+10][0][0][0],stand[i][0][0][0])
 		# because if sum is less than 21 toh sirf sum matter karega
-	
+
 	#time to sit down
 
 	#double down
@@ -101,14 +107,14 @@ def something(dealers_card,p):
 					hit[i][c][a][s] = 0
 					for j in range(2,10):
 						hit[i][c][a][s] += q * best[i+j][0][a][s]
-					hit[i][c][a][s] += p* best[i+10][0][a][s] 
+					hit[i][c][a][s] += p* best[i+10][0][a][s]
 					hit[i][c][a][s] += q* best[i+1][0][(a+2)/2][s]
 					if(c==0):
 						best[i][c][a][s]= max(hit[i][c][a][s],stand[i][c][a][s])
 					else:
 						best[i][c][a][s]= max(hit[i][c][a][s],stand[i][c][a][s],dd[i][c][a][s])
 						# best[i][c][a][s]= max()
-						
+
 	# we have assigned best values to splittable states which may not be correct
 	#take care
 	#potential source of error
@@ -166,7 +172,7 @@ def something(dealers_card,p):
 
 			# if i==9:
 			# 	print "newly found actual split for 9,9 is"
-			# 	print split[2*i][1][0][1] 
+			# 	print split[2*i][1][0][1]
 
 	#handle the pair of aces case
 	#can split only once
@@ -200,19 +206,29 @@ def something(dealers_card,p):
 
 		#pehle hard
 		print "hard"
+		h = []
 		for j in range(5,20):
 			print j, chosen(j,1,0,0)
+			h.append(chosen(j,1,0,0))
+		HARD.append(h)
 
 		print
 		print "now soft"
-		for j in range(3,22):
+		s=[]
+		for j in range(3,12):
 			print j-1,  chosen(j,1,1,0)
+			s.append(chosen(j,1,1,0))
+		SOFT.append(s)
 
 		print
 		print "now pairs"
-		print 'A',  chosen(2,1,1,1)
+		p = []
 		for j in range(2,11):
 			print j, chosen(2*j, 1,0,1)
+			p.append(chosen(2*j, 1,0,1))
+		print 'A',  chosen(2,1,1,1)
+		p.append(chosen(2,1,1,1))
+		PAIR.append(p)
 
 	def return_everything():
 		#for all possible initial hands i have return the best move
@@ -233,7 +249,25 @@ def something(dealers_card,p):
 			print j, chosen(2*j, 1,0,1) ,  hit[2*j][1][0][1] , stand[2*j][1][0][1], dd[2*j][1][0][1], split[2*j][1][0][1], best[2*j][1][0][1]
 		print 'A',  chosen(2,1,1,1) ,  hit[2][1][1][1] , stand[2][1][1][1], dd[2][1][1][1], split[2][1][1][1]
 
-	return_everything()
+	return_policy()
 
+# something(10,0.307)
+def trans(m):
+	pose = [[m[j][i] for j in range(len(m))] for i in range(len(m[0]))]
+	return pose
 
-something(10,0.307)
+for i in range(2,11):
+	something(i,P)
+something(1,P)
+
+print "HARD"
+for row in trans(HARD):
+	print row
+
+print "SOFT"
+for row in trans(SOFT):
+	print row
+
+print "PAIR"
+for row in trans(PAIR):
+	print row
