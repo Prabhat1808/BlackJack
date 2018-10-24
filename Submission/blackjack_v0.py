@@ -300,6 +300,7 @@ def output_policy():
 	global HARD
 	global SOFT
 	global PAIR
+	out_str = ""
 
 	for i in range(2,11):
 		something(i,P)
@@ -311,24 +312,39 @@ def output_policy():
 
 	for j in range(5,20):
 		print j, "\t",
+		out_str = out_str + str(j) + "\t"
 		for i in HARD[j-5]:
 			print i, " ",
+			out_str = out_str + str(i) + " "
+		out_str = out_str+"\n"
 		print
 
 	for j in range(3,11):
 		print "A"+str(j-1),"\t",
+		out_str = out_str + "A" + str(j-1) + "\t"
 		for i in SOFT[j-3]:
 			print i, " ",
+			out_str = out_str + str(i) + " "
+		out_str = out_str+"\n"
 		print
 
 	for j in range(2,11):
 		print str(j)+str(j),"\t",
+		out_str = out_str + str(j)*2 + "\t"
 		for i in PAIR[j-2]:
 			print i," ",
+			out_str = out_str + str(i) + " "
+		out_str = out_str+"\n"
 		print
 	print "AA","\t",
+	out_str = out_str + "AA\t"
 	for i in PAIR[9]:
 		print i, " ",
+		out_str = out_str + str(i) + " "
+
+	return out_str
 
 P = float(sys.argv[1])
-output_policy()
+policy = output_policy()
+file = open("Policy.txt","w+")
+file.write(policy)
