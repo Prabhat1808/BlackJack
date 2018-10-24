@@ -104,4 +104,19 @@ def print_all():
 		print prob_bj(i,0.307), prob_bust(i,0.307)
 
 
-print_all()
+# print_all()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

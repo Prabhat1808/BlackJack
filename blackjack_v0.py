@@ -10,7 +10,7 @@ def something(dealers_card,p):
 	#create stand matrix
 	q=(1.-p)/9
 	stand= [[[[DUMMY for i in range(0,2)] for j in range(0,2)] for k in range(0,2)] for l in range(0,32)]
-	#created a matrix of size [1-31][0-1][0-1]
+	#created a matrix of size [1-31][0-1][0-1]	
 
 	stand[11][1][1][0]= 1.5 * (1- prob_bj(dealers_card,p))
 	stand[11][1][1][1]= 1.5 * (1- prob_bj(dealers_card,p))
@@ -18,10 +18,10 @@ def something(dealers_card,p):
 	#potential mistake
 	stand[21][1][0][0] = stand[11][1][1][0]
 	stand[21][1][0][1] = stand[11][1][1][1]
-	stand[21][0][0][0] = prob_less(21) - prob_greater(21)
-	stand[21][0][0][1] = prob_less(21) - prob_greater(21)
-	stand[21][0][1][0] = prob_less(21) - prob_greater(21)
-	stand[21][0][1][1] = prob_less(21) - prob_greater(21)
+	stand[21][0][0][0] = prob_less(dealers_card,21,p) - prob_greater(dealers_card,21,p)
+	stand[21][0][0][1] = prob_less(dealers_card,21,p) - prob_greater(dealers_card,21,p)
+	stand[21][0][1][0] = prob_less(dealers_card,21,p) - prob_greater(dealers_card,21,p)
+	stand[21][0][1][1] = prob_less(dealers_card,21,p) - prob_greater(dealers_card,21,p)
 
 	#whenn i get busted
 	for i in range(22, 32):
@@ -32,10 +32,10 @@ def something(dealers_card,p):
 
 	#when im in bw 21 and  17
 	for i in range(17,21):
-		stand[i][0][0][0]= prob_less(i) - prob_greater(i)
-		stand[i][0][0][1]= prob_less(i) - prob_greater(i)
-		stand[i][1][0][0]= prob_less(i) - prob_greater(i)
-		stand[i][1][0][1]= prob_less(i) - prob_greater(i)
+		stand[i][0][0][0]= prob_less(dealers_card,i,p) - prob_greater(dealers_card,i,p)
+		stand[i][0][0][1]= prob_less(dealers_card,i,p) - prob_greater(dealers_card,i,p)
+		stand[i][1][0][0]= prob_less(dealers_card,i,p) - prob_greater(dealers_card,i,p)
+		stand[i][1][0][1]= prob_less(dealers_card,i,p) - prob_greater(dealers_card,i,p)
 
 	#when im less than this toh i hope ki uska bust ho jaaye
 	for i in range(2,17):
@@ -51,7 +51,7 @@ def something(dealers_card,p):
 		stand[i][1][1][0]=maxi(stand[i+10][0][0][0],stand[i][0][0][0])
 		stand[i][1][1][1]=maxi(stand[i+10][0][0][0],stand[i][0][0][0])
 		# because if sum is less than 21 toh sirf sum matter karega
-
+	
 	#time to sit down
 
 	#double down
@@ -67,15 +67,15 @@ def something(dealers_card,p):
 	for n in range(2,22):
 		for c in range(2):
 			for a in range(2):
-				dd[n][c][a][0]= p*stand[n+10][0][a][0]
-				dd[n][c][a][1]= p*stand[n+10][0][a][1]
+				dd[n][c][a][0]= 2*p*stand[n+10][0][a][0]
+				dd[n][c][a][1]= 2*p*stand[n+10][0][a][1]
 				#handling face card
 				for i in range(2,10):
-					dd[n][c][a][0]+= q*stand[n+i][0][a][0]
-					dd[n][c][a][1]+= q*stand[n+i][0][a][1]
+					dd[n][c][a][0]+= 2*q*stand[n+i][0][a][0]
+					dd[n][c][a][1]+= 2*q*stand[n+i][0][a][1]
 				#handling the ace ab-
-				dd[n][c][a][0]+= q*stand[n+1][0][(a+2)/2][0]
-				dd[n][c][a][1]+= q*stand[n+1][0][(a+2)/2][1]
+				dd[n][c][a][0]+= 2*q*stand[n+1][0][(a+2)/2][0]
+				dd[n][c][a][1]+= 2*q*stand[n+1][0][(a+2)/2][1]
 				#here i have made sure that if a is 1 and i get another then its still one
 
 	#hit and best simultaneously
@@ -100,15 +100,15 @@ def something(dealers_card,p):
 				for a in range(2):
 					hit[i][c][a][s] = 0
 					for j in range(2,10):
-						hit[i][c][a][s] += q * best[n+j][0][a][s]
-					hit[i][c][a][s] += p* best[n+10][0][a][s]
-					hit[i][c][a][s] += q* best[n+1][0][(a+2)/2][s]
+						hit[i][c][a][s] += q * best[i+j][0][a][s]
+					hit[i][c][a][s] += p* best[i+10][0][a][s] 
+					hit[i][c][a][s] += q* best[i+1][0][(a+2)/2][s]
 					if(c==0):
-						best[i][c][a][s]= maxi(hit[i][c][a][s],stand[i][c][a][s])
+						best[i][c][a][s]= max(hit[i][c][a][s],stand[i][c][a][s])
 					else:
 						best[i][c][a][s]= max(hit[i][c][a][s],stand[i][c][a][s],dd[i][c][a][s])
 						# best[i][c][a][s]= max()
-
+						
 	# we have assigned best values to splittable states which may not be correct
 	#take care
 	#potential source of error
@@ -120,8 +120,6 @@ def something(dealers_card,p):
 	#handling aces later
 	for i in range(2,11):
 		#case1 - assume split is besr
-		recalculate = False
-
 		split[2*i][1][0][1]= 0
 		temp=0
 		for j in range(2,i):
@@ -131,7 +129,7 @@ def something(dealers_card,p):
 
 		temp += q* best[i+1][1][1][0]
 		if(i!=10):
-			temp += temp + p*best[i+10][1][0][0]
+			temp = temp + p*best[i+10][1][0][0]
 
 		temp= 2*temp
 		if(i==10):
@@ -142,30 +140,100 @@ def something(dealers_card,p):
 	#checking for contradiction
 		if(split[2*i][1][0][1] >=  best[2*i][1][0][1]):
 			#badhiya
+			# if i==9 :
+			# 	print "yes for a pair of 9 split is optimal"
 			best[2*i][1][0][1]= split[2*i][1][0][1]
 		else:
-			best[2*i][1][0][1] = max(hit[2*i][1][0][1],stand[2*i][1][0][1],double[2*i][1][0][1])
-			recalculate = True
 			#panga ho giya
 			#dhyaan se likhiyo please
-		if(recalculate):
-			# recalculating the value for split, since initial assumption(split being best) was false
-			split[2*i][1][0][1]= 0
-			for j in range(2,i):
-				split[2*i][1][0][1] += q*best[i+j][1][0][0]
-			for j in range(i+1,10):
-				split[2*i][1][0][1] += q*best[i+j][1][0][0]
-			split[2*i][1][0][1] += q* best[i+1][1][1][0]
-			if(i!=10):
-				split[2*i][1][0][1] +=  p*best[i+10][1][0][0]
-			split[2*i][1][0][1] *= 2
 
-	# Handling aces now
-	best[2][1][1][1] = max(hit[2][1][1][1],stand[2][1][1][1],double[2][1][1][1])
-	split[2][1][1][1]= 0
+			#case2
+			# if i==9 :
+			# 	print "no for a pair of 9 split is not optimal"
+			# 	print split[18][1][0][1]
+			# 	print "this was the proposed split "
+			# 	print "but its not better than "
+			# 	print best[18][1][0][1]
+
+			temp = 0
+			for j in range(2,10):
+				temp = temp + q*(best[j+i][1][0][0])
+			temp = temp + p*(best[i+10][1][0][0])
+			temp = temp + q*(best[i+1][1][1][0])
+
+			#best jo set hai voh sahi hai but we still get the new correct value of splittable
+			split[2*i][1][0][1] = 2*temp
+
+			# if i==9:
+			# 	print "newly found actual split for 9,9 is"
+			# 	print split[2*i][1][0][1] 
+
+	#handle the pair of aces case
+	#can split only once
+	#no bj after this and no doubling either
+	temp=0
 	for j in range(2,10):
-		split[2][1][1][1] += q*best[1+j][1][1][0]
-	split[2][1][1][1] += q* best[2][1][1][1]
-	# How to handle this...coz this is no longer splittable, even if we get another ACE
-	# what should be on RHS of above statement? -> best[2][1][1][1] or best[2][1][1][0] ??
-	split[2][1][1][1] *= 2
+		temp = temp + q* stand[1+j][0][1][0]
+	temp= temp + p*stand[11][0][1][0]
+	temp= temp + q*stand[2][0][1][0] #haan consider the non splittable version
+
+	temp= 2*temp
+
+	split[2][1][1][1] = temp
+	if(temp>best[2][1][1][1]):
+		best[2][1][1][1]=temp
+
+	def chosen(n, c, a, s ):
+		if(best[n][c][a][s]== hit[n][c][a][s]):
+			return "H"
+		elif(best[n][c][a][s]== dd[n][c][a][s]):
+			return "D"
+		elif(best[n][c][a][s]== stand[n][c][a][s]):
+			return "S"
+		elif(best[n][c][a][s]== split[n][c][a][s]):
+			return "P"
+		else:
+			return "ERROR"
+
+	def return_policy():
+		#for all possible initial hands i have return the best move
+
+		#pehle hard
+		print "hard"
+		for j in range(5,20):
+			print j, chosen(j,1,0,0)
+
+		print
+		print "now soft"
+		for j in range(3,22):
+			print j-1,  chosen(j,1,1,0)
+
+		print
+		print "now pairs"
+		print 'A',  chosen(2,1,1,1)
+		for j in range(2,11):
+			print j, chosen(2*j, 1,0,1)
+
+	def return_everything():
+		#for all possible initial hands i have return the best move
+
+		#pehle hard
+		print "hard"
+		for j in range(5,20):
+			print j, chosen(j,1,0,0), hit[j][1][0][0] , stand[j][1][0][0], dd[j][1][0][0], split[j][1][0][0]
+
+		print
+		print "now soft"
+		for j in range(3,12):
+			print j-1,  chosen(j,1,1,0) , hit[j][1][1][0] , stand[j][1][1][0], dd[j][1][1][0], split[j][1][1][0]
+
+		print
+		print "now pairs"
+		for j in range(2,11):
+			print j, chosen(2*j, 1,0,1) ,  hit[2*j][1][0][1] , stand[2*j][1][0][1], dd[2*j][1][0][1], split[2*j][1][0][1], best[2*j][1][0][1]
+		print 'A',  chosen(2,1,1,1) ,  hit[2][1][1][1] , stand[2][1][1][1], dd[2][1][1][1], split[2][1][1][1]
+
+	return_everything()
+
+
+something(10,0.307)
