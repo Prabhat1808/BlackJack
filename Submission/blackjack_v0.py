@@ -58,6 +58,8 @@ def something(dealers_card,p):
 		stand[i][1][1][1]=maxi(stand[i+10][0][0][0],stand[i][0][0][0])
 		# because if sum is less than 21 toh sirf sum matter karega
 
+	stand[11][1][1][0]= 1.5 * (1- prob_bj(dealers_card,p))
+	stand[11][1][1][1]= 1.5 * (1- prob_bj(dealers_card,p))
 	#time to sit down
 
 	#double down
